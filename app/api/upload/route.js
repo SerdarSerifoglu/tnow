@@ -2,14 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { NextResponse } from 'next/server';
 
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
-};
-
 // POST metodunu export et
 export async function POST(req) {
   try {
