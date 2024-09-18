@@ -1,23 +1,22 @@
-import fs from 'fs';
-import path from 'path';
 import { NextResponse } from 'next/server';
 
-// POST metodunu export et
 export async function POST(req) {
   try {
     const { imageData, fileName } = await req.json();
 
-    // Resmin kaydedileceği yol
-    const filePath = path.join(process.cwd(), 'public/images', fileName);
+    const formData = new FormData();
+    formData.append('file', imageData);
+    formData.append('upload_preset', 'srdr0000'); // Cloudinary'deki upload preset
+    formData.append('public_id', fileName);
 
-    // Base64 formatındaki resmi decode et ve kaydet
-    const base64Data = imageData.replace(/^data:image\/jpeg;base64,/, '');
+    const response = await fetch('https://api.cloudinary.com/v1_1/serdarcloud/image/upload', {
+      method: 'POST',
+      body: formData,
+    });
 
-    fs.writeFileSync(filePath, base64Data, 'base64');
-
-    // Kaydedilen dosyanın URL'ini döndür
-    return NextResponse.json({ url: `/images/${fileName}` });
+    const data = await response.json();
+    return NextResponse.json({ url: data.secure_url });
   } catch (error) {
-    return NextResponse.json({ message: 'Error saving the file' }, { status: 500 });
+    return NextResponse.json({ message: 'Error uploading the file' }, { status: 500 });
   }
 }
